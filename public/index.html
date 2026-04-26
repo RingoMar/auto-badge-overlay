@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sun Theme Twitch Overlay</title>
+  <style>
+    :root {
+      --sun-1: #ffcf4d;
+      --sun-2: #ff9f1c;
+      --sun-3: #ff6b1a;
+      --sun-4: #fff2b2;
+      --text-main: #fff8e8;
+      --text-sub: #ffe7a8;
+      --red-flash: #ff3030;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 9.6px;
+      /* 16px × 0.6 */
+      background: transparent;
+    }
+
+    .overlay {
+      position: relative;
+      width: 441.6px;
+      /* 736 × 0.6 */
+      height: 86.4px;
+      /* 144 × 0.6 */
+      display: flex;
+      align-items: center;
+      gap: 10.56px;
+      /* 17.6 × 0.6 */
+      padding: 8.64px 11.52px 8.64px 8.64px;
+      /* scaled */
+      border-radius: 11.52px;
+      /* 19.2 × 0.6 */
+      overflow: hidden;
+
+      background:
+        radial-gradient(circle at 18% 50%, rgba(255, 226, 120, 0.30), transparent 24%),
+        radial-gradient(circle at 85% 20%, rgba(255, 195, 0, 0.18), transparent 22%),
+        linear-gradient(135deg, rgba(255, 175, 41, 0.92), rgba(255, 115, 0, 0.88));
+
+      border: 1.44px solid rgba(255, 245, 190, 0.75);
+      /* 2.4 × 0.6 */
+      box-shadow:
+        0 0 8.64px rgba(255, 191, 0, 0.45),
+        0 0 21.6px rgba(255, 110, 0, 0.25),
+        inset 0 0 12px rgba(255, 255, 255, 0.08);
+
+      animation: pulseGlow 4s ease-in-out infinite;
+    }
+
+    .overlay::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        repeating-conic-gradient(from 0deg,
+          rgba(255, 240, 190, 0.18) 0deg 8deg,
+          transparent 8deg 22deg);
+      opacity: 0.18;
+      animation: spinRays 18s linear infinite;
+      pointer-events: none;
+    }
+
+    .overlay::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.18) 45%, transparent 60%);
+      transform: translateX(-130%);
+      animation: shimmer 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .overlay.flash {
+      animation:
+        pulseGlow 4s ease-in-out infinite,
+        redFlash 0.8s ease-in-out 1;
+    }
+
+    .image-wrap {
+      position: relative;
+      z-index: 2;
+      flex: 0 0 67.2px;
+      /* 112 × 0.6 */
+      width: 67.2px;
+      height: 67.2px;
+      border-radius: 10.56px;
+      /* 17.6 × 0.6 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.35), transparent 35%),
+        radial-gradient(circle, #ffd866 0%, #ff9f1c 70%, #ff7b00 100%);
+      box-shadow:
+        0 0 0 1.92px rgba(255, 244, 200, 0.55),
+        0 0 12px rgba(255, 189, 0, 0.65);
+      animation: floatBox 3.8s ease-in-out infinite;
+    }
+
+    .image-wrap .sun-ring {
+      position: absolute;
+      width: 72.96px;
+      /* 121.6 × 0.6 */
+      height: 72.96px;
+      border-radius: 13.44px;
+      /* 22.4 × 0.6 */
+      border: 0.96px solid rgba(255, 245, 205, 0.45);
+      /* 1.6 × 0.6 */
+      box-shadow: 0 0 11.52px rgba(255, 230, 110, 0.35);
+      animation: ringPulse 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .image-wrap img {
+      width: 54.72px;
+      /* 91.2 × 0.6 */
+      height: 54.72px;
+      object-fit: cover;
+      border-radius: 8.64px;
+      /* 14.4 × 0.6 */
+      display: block;
+      border: 1.44px solid rgba(255, 248, 218, 0.85);
+      /* 2.4 × 0.6 */
+      box-shadow: 0 2.88px 6.72px rgba(0, 0, 0, 0.18);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 19.2px;
+      /* 32 × 0.6 */
+      line-height: 1.15;
+      font-weight: 900;
+      letter-spacing: 0.192px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      text-shadow:
+        0 0.96px 0 rgba(130, 50, 0, 0.25),
+        0 0 4.8px rgba(255, 243, 186, 0.30);
+      text-align: center;
+    }
+
+    .title .accent {
+      color: #fff3be;
+    }
+
+    .mini-note {
+      margin-top: 3.84px;
+      font-size: 14.4px;
+      /* 24 × 0.6 */
+      text-align: center;
+      font-weight: 700;
+      color: #A14F00;
+      letter-spacing: 0.096px;
+      text-shadow: 0 0 4.8px #63b6c729;
+    }
+
+    .particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      bottom: -9.6px;
+      border-radius: 50%;
+      opacity: 0.75;
+      filter: blur(0.5px);
+      animation-name: rise;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .spark {
+      position: absolute;
+      width: 0.96px;
+      height: 7.68px;
+      border-radius: 999px;
+      background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 240, 170, 0.9));
+      opacity: 0.55;
+      animation: drift 6s linear infinite;
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        box-shadow:
+          0 0 8.64px rgba(255, 191, 0, 0.45),
+          0 0 21.6px rgba(255, 110, 0, 0.25),
+          inset 0 0 12px rgba(255, 255, 255, 0.08);
+      }
+
+      50% {
+        box-shadow:
+          0 0 11.52px rgba(255, 208, 70, 0.65),
+          0 0 27.84px rgba(255, 120, 0, 0.32),
+          inset 0 0 13.44px rgba(255, 255, 255, 0.14);
+      }
+    }
+
+    @keyframes redFlash {
+      0% {
+        border-color: rgba(255, 245, 190, 0.75);
+        box-shadow:
+          0 0 8.64px rgba(255, 191, 0, 0.45),
+          0 0 21.6px rgba(255, 110, 0, 0.25),
+          inset 0 0 12px rgba(255, 255, 255, 0.08);
+      }
+
+      20% {
+        border-color: rgba(255, 70, 70, 1);
+        box-shadow:
+          0 0 0 1.44px rgba(255, 70, 70, 0.75),
+          0 0 11.52px rgba(255, 50, 50, 0.9),
+          0 0 24px rgba(255, 30, 30, 0.55),
+          inset 0 0 12px rgba(255, 255, 255, 0.08);
+      }
+
+      45% {
+        border-color: rgba(255, 220, 220, 0.85);
+      }
+
+      70% {
+        border-color: rgba(255, 70, 70, 1);
+        box-shadow:
+          0 0 0 0.96px rgba(255, 70, 70, 0.7),
+          0 0 13.44px rgba(255, 30, 30, 0.85),
+          0 0 25.92px rgba(255, 20, 20, 0.45),
+          inset 0 0 12px rgba(255, 255, 255, 0.08);
+      }
+
+      100% {
+        border-color: rgba(255, 245, 190, 0.75);
+      }
+    }
+
+    @keyframes spinRays {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes shimmer {
+
+      0%,
+      65%,
+      100% {
+        transform: translateX(-130%);
+      }
+
+      80% {
+        transform: translateX(130%);
+      }
+    }
+
+    @keyframes floatBox {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-2.4px);
+      }
+    }
+
+    @keyframes ringPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+
+      50% {
+        transform: scale(1.03);
+        opacity: 1;
+      }
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      90% {
+        opacity: 0.45;
+      }
+
+      100% {
+        transform: translateY(-105.6px) translateX(9.6px);
+        opacity: 0;
+      }
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translateY(0) rotate(8deg);
+        opacity: 0;
+      }
+
+      15% {
+        opacity: 0.55;
+      }
+
+      100% {
+        transform: translateY(-96px) rotate(8deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stage">
+    <div class="overlay" id="overlay">
+      <div class="particles" id="particles"></div>
+
+      <div class="image-wrap">
+        <div class="sun-ring"></div>
+        <img src="https://placehold.co/220x220/png" alt="Badge" />
+      </div>
+
+      <div class="content">
+        <h1 class="title">
+          Subscribe or gift <span class="accent">one sub</span><br />
+          to earn this badge
+        </h1>
+        <div class="mini-note">PRIME SUB DOESN'T COUNT</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const particles = document.getElementById("particles");
+    const overlay = document.getElementById("overlay");
+
+    function createParticle() {
+      const p = document.createElement("div");
+      p.className = "particle";
+
+      const size = Math.random() * 7 + 4;
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animationDuration = (Math.random() * 4 + 4) + "s";
+      p.style.animationDelay = (Math.random() * 2) + "s";
+
+      const glowTypes = [
+        "radial-gradient(circle, rgba(255,245,190,0.95) 0%, rgba(255,193,7,0.75) 55%, rgba(255,150,0,0) 100%)",
+        "radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,227,120,0.75) 45%, rgba(255,180,0,0) 100%)",
+        "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(255,110,0,0.60) 50%, rgba(255,110,0,0) 100%)"
+      ];
+      p.style.background = glowTypes[Math.floor(Math.random() * glowTypes.length)];
+
+      particles.appendChild(p);
+    }
+
+    function createSpark() {
+      const s = document.createElement("div");
+      s.className = "spark";
+      s.style.left = Math.random() * 100 + "%";
+      s.style.bottom = (Math.random() * 35) + "px";
+      s.style.animationDuration = (Math.random() * 3 + 4) + "s";
+      s.style.animationDelay = (Math.random() * 2) + "s";
+      particles.appendChild(s);
+    }
+
+    for (let i = 0; i < 22; i++) createParticle();
+    for (let i = 0; i < 10; i++) createSpark();
+
+    function randomRedFlash() {
+      overlay.classList.add("flash");
+      setTimeout(() => overlay.classList.remove("flash"), 850);
+
+      const next = Math.random() * 300_000; // 6s to 11s
+      setTimeout(randomRedFlash, next);
+    }
+
+    setTimeout(randomRedFlash, 4000);
+  </script>
+  <script src="badge-game.js"></script>
+</body>
+
+</html>

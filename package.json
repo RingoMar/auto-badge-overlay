@@ -1,0 +1,15 @@
+{
+  "name": "gptbadge",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/sync-assets.js",
+    "dev": "wrangler dev",
+    "predeploy": "node scripts/sync-assets.js",
+    "deploy": "wrangler deploy",
+    "start": "node server.js",
+    "sync-assets": "node scripts/sync-assets.js"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  }
+}
