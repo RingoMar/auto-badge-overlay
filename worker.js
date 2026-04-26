@@ -2,13 +2,26 @@ const STREAM_DATABASE_EVENTS_URL = "https://api.streamdatabase.com/events";
 const TWITCH_GQL_URL = "https://gql.twitch.tv/gql";
 const DEFAULT_TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko";
 const EVENTS_CACHE_TTL_SECONDS = 3600;
+const ROBOTS_HEADER_VALUE = "noindex, nofollow, noarchive, nosnippet, noimageindex";
+
+function withRobotsHeader(response) {
+  const headers = new Headers(response.headers);
+  headers.set("X-Robots-Tag", ROBOTS_HEADER_VALUE);
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
 
 function jsonResponse(payload, status = 200) {
   return new Response(JSON.stringify(payload), {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store"
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": ROBOTS_HEADER_VALUE
     }
   });
 }
@@ -19,7 +32,8 @@ function proxiedResponse(response, body, cacheControl) {
     statusText: response.statusText,
     headers: {
       "Content-Type": response.headers.get("content-type") || "application/json; charset=utf-8",
-      "Cache-Control": cacheControl
+      "Cache-Control": cacheControl,
+      "X-Robots-Tag": ROBOTS_HEADER_VALUE
     }
   });
 }
@@ -79,7 +93,7 @@ export default {
         return jsonResponse({ error: "Method not allowed" }, 405);
       }
 
-      return env.ASSETS.fetch(request);
+      return withRobotsHeader(await env.ASSETS.fetch(request));
     } catch (error) {
       return jsonResponse({ error: error.message || "Proxy request failed" }, 502);
     }

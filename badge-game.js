@@ -80,17 +80,20 @@ query($login: String!) {
 
   function setBadgeImage(badgeUrl) {
     const nextBadgeUrl = badgeUrl || "";
-    if (!badgeImage || activeBadgeUrl === nextBadgeUrl) return;
+    if (!badgeImage) return;
+    if (nextBadgeUrl && activeBadgeUrl === nextBadgeUrl && badgeImage.style.opacity !== "0") return;
 
     activeBadgeUrl = nextBadgeUrl;
 
     if (nextBadgeUrl) {
       badgeImage.src = nextBadgeUrl;
+      badgeImage.style.opacity = "";
       badgeImage.style.visibility = "";
       return;
     }
 
     badgeImage.src = BLANK_BADGE_SRC;
+    badgeImage.style.opacity = "0";
     badgeImage.style.visibility = "hidden";
   }
 
@@ -107,6 +110,7 @@ query($login: String!) {
   async function fetchCurrentTwitchGame() {
     const response = await fetch(TWITCH_GQL_URL, {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json"
       },
@@ -141,7 +145,7 @@ query($login: String!) {
     try {
       const gameName = await fetchCurrentTwitchGame();
       const badgeUrl = badgeUrlByGame.get(normalizeGameName(gameName));
-      setBadgeImage(badgeUrl);
+      setBadgeImage(badgeUrl || "");
     } catch (error) {
       console.error(error);
       setBadgeImage("");

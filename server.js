@@ -7,6 +7,7 @@ const ROOT_DIR = __dirname;
 const STREAM_DATABASE_EVENTS_URL = "https://api.streamdatabase.com/events";
 const TWITCH_GQL_URL = "https://gql.twitch.tv/gql";
 const TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko";
+const ROBOTS_HEADER_VALUE = "noindex, nofollow, noarchive, nosnippet, noimageindex";
 
 const contentTypes = {
   ".css": "text/css; charset=utf-8",
@@ -19,6 +20,7 @@ const contentTypes = {
 };
 
 function send(res, status, body, headers = {}) {
+  headers["X-Robots-Tag"] = ROBOTS_HEADER_VALUE;
   res.writeHead(status, headers);
   res.end(body);
 }
